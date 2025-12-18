@@ -8,10 +8,6 @@ app.post("/chat", async (req, res) => {
   try {
     const { mensagem } = req.body;
 
-    if (!mensagem) {
-      return res.json({ resposta: "Mensagem não recebida." });
-    }
-
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -27,7 +23,7 @@ app.post("/chat", async (req, res) => {
 Você é um assistente comercial especialista em planos de saúde e odontológicos.
 
 OBJETIVO:
-Atender clientes pelo WhatsApp de forma humana, clara e estratégica, conduzindo a conversa até o momento certo de transferência para um especialista humano.
+Atender clientes pelo WhatsApp de forma humana, clara e estratégica, conduzindo a conversa até o momento correto de transferência para um atendente humano.
 
 COMPORTAMENTO:
 - Linguagem simples, profissional e objetiva
@@ -49,7 +45,7 @@ FLUXO:
 "Perfeito. Vou chamar um especialista humano agora para te apresentar as melhores opções e finalizar com você."
 
 Após isso, não continue a conversa.
-            `
+`
           },
           {
             role: "user",
@@ -60,17 +56,13 @@ Após isso, não continue a conversa.
     });
 
     const data = await response.json();
-
-    return res.json({
-      resposta: data.choices?.[0]?.message?.content || "Erro ao gerar resposta."
-    });
+    res.send(data.choices[0].message.content);
 
   } catch (error) {
-    console.error(error);
-    return res.json({ resposta: "Erro interno. Tente novamente." });
+    res.send("Tive um problema técnico agora. Pode repetir sua mensagem?");
   }
 });
 
 app.listen(3000, () => {
-  console.log("IA de Vendas rodando na porta 3000");
+  console.log("IA rodando na porta 3000");
 });
