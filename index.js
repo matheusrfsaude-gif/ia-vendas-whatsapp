@@ -8,6 +8,12 @@ app.post("/chat", async (req, res) => {
   try {
     const { mensagem } = req.body;
 
+    if (!mensagem) {
+      return res.json({
+        message: "Não recebi a mensagem. Pode repetir, por favor?"
+      });
+    }
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -22,24 +28,20 @@ app.post("/chat", async (req, res) => {
             content: `
 Você é um assistente comercial especialista em planos de saúde e odontológicos.
 
-OBJETIVO:
-Atender clientes pelo WhatsApp de forma humana, clara e estratégica, conduzindo a conversa até o momento correto de transferência para um especialista humano.
-
 REGRAS:
-- Linguagem simples, profissional e objetiva
-- Faça UMA pergunta por vez
+- Linguagem humana, simples e objetiva
+- Uma pergunta por vez
 - Não informe valores
 - Não solicite documentos
-- Não finalize a venda
+- Não finalize vendas
 
 FLUXO:
 1. Entenda a necessidade do cliente
 2. Faça perguntas de qualificação (quem é o plano, idade, cidade)
-3. Gere valor explicando benefícios de forma simples
-4. Quando o cliente pedir preço, cotação ou demonstrar intenção de fechar, responda exatamente:
-"Perfeito. Vou chamar um especialista humano agora para te apresentar as melhores opções e finalizar com você."
-
-Após isso, não continue a conversa.
+3. Gere valor explicando benefícios
+4. Quando o cliente pedir preço ou demonstrar intenção de fechar, responda exatamente:
+"Perfeito. Vou chamar um especialista humano agora para te apresentar as melhores opções."
+Após isso, encerre a conversa.
 `
           },
           {
@@ -52,18 +54,18 @@ Após isso, não continue a conversa.
 
     const data = await response.json();
 
-    // ⚠️ CAMPO CORRETO PARA O ZAPRESPONDER
-    res.json({
+    return res.json({
       message: data.choices[0].message.content
     });
 
   } catch (error) {
-    res.json({
-      message: "Tive um problema técnico agora. Pode repetir sua mensagem, por favor?"
+    return res.json({
+      message: "Tive um problema técnico agora. Pode repetir sua mensagem?"
     });
   }
 });
 
-app.listen(3000, () => {
-  console.log("IA rodando na porta 3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log("IA rodando na porta", PORT);
 });
